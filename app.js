@@ -76,7 +76,9 @@ var checkMessageForShimzar = function (message) {
 var checkMessageForBotContent = function (message) {
     if (message.content.charAt(0) == "$" && message.author.bot === false) {
         if (!checkMessageForDeck(message)) {
-            checkMessageForCard(message);
+            if (!checkMessageForCard(message)){
+                message.channel.sendMessage("Извини, но такой команды я не знаю.");
+            }
         }
     }
 };
@@ -86,7 +88,7 @@ var checkMessageForDeck = function (message) {
     if (message.content.toLowerCase().match(re_deck) && message.author.bot === false) {
         var deck_channel = message.guild.channels.find("name","decks");
         if (message.attachments.array().length > 0) {
-            deck_channel.sendFile(message.attachments.array()[0]["url"]);
+            deck_channel.sendFile(message.attachments.array()[0].url);
         }
         deck_channel.sendMessage(message.content.replace("$deck",""));
         return true;
@@ -131,7 +133,9 @@ var checkMessageForCard = function (message) {
                 message.channel.sendMessage(out.url);
             }
         }
+        return true;
     }
+    return false;
 };
 
 var checkCardsCollection = function(collection) {
