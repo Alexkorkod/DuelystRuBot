@@ -77,7 +77,8 @@ var checkMessageForBotContent = function (message) {
     if (message.content.charAt(0) == "$" && message.author.bot === false) {
         if (!checkMessageForDeck(message)) {
             if (!checkMessageForCard(message)){
-                message.channel.sendMessage("Извини, но такой команды я не знаю.");
+                message.channel.sendMessage("Извини, но такой команды я не знаю.\n"+
+                    "Информацию обо мне можно посмотреть по команде $bot");
             }
         }
     }
