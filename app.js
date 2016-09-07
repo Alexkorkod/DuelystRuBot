@@ -26,7 +26,7 @@ bot.on('ready', () => {
   console.log('I am ready!');
 });
 
-bot.login(process.env.BOT_TOCKEN);
+bot.login(process.env.BOT_TOKEN);
 
 bot.on('message', message => {
     var re_hello = new RegExp("\\$(привет|hello|hi|list|commands|команды|bot|бот).*");
