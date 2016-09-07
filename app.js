@@ -2,6 +2,7 @@ var request = require('request'),
     fs = require('fs'),
     parsedContent, 
     card_list = [],
+    card_list_shimzar = [], 
     card_image,
     card_label,
     card_manacost,
@@ -16,6 +17,12 @@ request("https://duelystdb.com/card/all.json",
       }
     }
   );
+  
+fs.readFile("./shimzar.json", (err, data) => {
+  if (err) throw err;
+  card_list_shimzar = JSON.parse(data);
+});
+
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 
@@ -49,13 +56,30 @@ bot.on('error', (error) => {
   console.log(error);
 });
 
+var checkMessageForShimzar = function (message) {
+    var out = [],
+        counter = 1000;
+    card_list_shimzar.forEach(function(item){
+        var loweredContent = message.content.toLowerCase(),
+            trimmedContent = loweredContent.replace("$",""),
+            re = new RegExp(".*"+trimmedContent+".*");
+        if (item.label.toLowerCase().match(re)){
+            out[counter] = [];
+            out[counter].url = item.url;
+            out[counter].card_label = item.label;
+            counter++;
+        }
+    });
+    return out;
+};
+
 var checkMessageForBotContent = function (message) {
-    if (message.content.charAt(0) == "$") {
+    if (message.content.charAt(0) == "$" && message.author.bot === false) {
         if (!checkMessageForDeck(message)) {
             checkMessageForCard(message);
         }
     }
-}
+};
 
 var checkMessageForDeck = function (message) {
     var re_deck = new RegExp("\\$deck.*");
@@ -68,7 +92,7 @@ var checkMessageForDeck = function (message) {
         return true;
     }
     return false;
-}
+};
 
 var checkMessageForCard = function (message) {
     var chosen_cards_list = [],
@@ -89,17 +113,23 @@ var checkMessageForCard = function (message) {
             counter++;
         }
     });
-    if (chosen_cards_list.length > 0 && message.author.bot === false) {
+    chosen_cards_list_shimzar = checkMessageForShimzar(message);
+    chosen_cards_list = chosen_cards_list.concat(chosen_cards_list_shimzar);
+    if (chosen_cards_list.length > 0) {
         out = checkCardsCollection(chosen_cards_list);
         if (typeof out === "string") {
             message.channel.sendMessage(out + "?");
         } else {
-            message.channel.sendMessage(out.card_image+"\n"+
-                out.card_label+" : "+
-                out.card_manacost+" mana\n"+
-                out.card_attack+"/"+
-                out.card_health+"\n"+
-                out.card_text); 
+            if (!("url" in out)) {
+                message.channel.sendMessage(out.card_image+"\n"+
+                    out.card_label+" : "+
+                    out.card_manacost+" mana\n"+
+                    out.card_attack+"/"+
+                    out.card_health+"\n"+
+                    out.card_text); 
+            } else {
+                message.channel.sendMessage(out.url);
+            }
         }
     }
 };
@@ -108,11 +138,15 @@ var checkCardsCollection = function(collection) {
     var out;
     collection = makeCollUnique(collection);
     if (Object.keys(collection).length == 1) {
-        out = replaceHTML(collection[(Object.keys(collection)[0])]);
+        if ("card_text" in collection[(Object.keys(collection)[0])]) {
+            out = replaceHTML(collection[(Object.keys(collection)[0])]);
+        } else {
+            out = collection[(Object.keys(collection)[0])];
+        }
     } else {
         out = "";
         for (var item in collection) {
-            if (collection[item].card_text !== "") {
+            if (card_text in collection[item] && collection[item].card_text !== "") {
                 collection[item] = replaceHTML(collection[item]);
             }
             out = out + " или $" + collection[item].card_label;
