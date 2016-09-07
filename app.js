@@ -139,7 +139,8 @@ var checkMessageForCard = function (message) {
 };
 
 var checkCardsCollection = function(collection) {
-    var out;
+    var out,
+        counter;
     collection = makeCollUnique(collection);
     if (Object.keys(collection).length == 1) {
         if ("card_text" in collection[(Object.keys(collection)[0])]) {
@@ -149,13 +150,19 @@ var checkCardsCollection = function(collection) {
         }
     } else {
         out = "";
+        counter = 0;
         for (var item in collection) {
             if (card_text in collection[item] && collection[item].card_text !== "") {
                 collection[item] = replaceHTML(collection[item]);
             }
-            out = out + " или $" + collection[item].card_label;
+            if (counter == Object.keys(collection).length-1) {
+                out = out + " или $" + collection[item].card_label;
+            } else { 
+                out = out + ", $" + collection[item].card_label;
+            }
+            counter++;
         }
-        out = out.replace(" или ","");
+        out = out.replace(", ","");
     }
     return out;
 };
