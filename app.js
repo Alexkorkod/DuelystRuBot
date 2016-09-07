@@ -51,9 +51,7 @@ bot.on('error', (error) => {
 
 var checkMessageForBotContent = function (message) {
     if (message.content.charAt(0) == "$") {
-        if (checkMessageForDeck(message)) {
-            //Do nothing, lul. Stud
-        } else {
+        if (!checkMessageForDeck(message)) {
             checkMessageForCard(message);
         }
     }
