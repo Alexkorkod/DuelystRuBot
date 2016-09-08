@@ -37,7 +37,7 @@ bot.on('message', message => {
         message.channel.sendMessage("Привет! Я бот этого канала.\n"+
         "Я умею рассказывать про карту, если написать ее название на английском, поставив перед ним символ $.\n"+
         "Если не помнишь название карты целиком - не беда, я пойму тебя даже по его части!\n"+
-        "Комманда $decklist выдаст тебе ссылку на свежие колоды."+
+        "Комманда $decklist выдаст тебе ссылку на свежие колоды.\n"+
         "А еще, если напишешь $deck перед сообщением, я его скопирую в канал \"decks\".");
     } else {
         checkMessageForBotContent(message);
@@ -130,16 +130,13 @@ var checkMessageForCard = function (message) {
         if (typeof out === "string") {
             message.channel.sendMessage(out + "?");
         } else {
-            if (!("url" in out)) {
-                message.channel.sendMessage(out.card_image+"\n"+
-                    out.card_label+" : "+
-                    out.card_manacost+" mana\n"+
-                    out.card_attack+"/"+
-                    out.card_health+"\n"+
-                    out.card_text); 
-            } else {
-                 message.channel.sendMessage(out.url);
-            }
+            reply = out.card_label+" : "+
+                out.card_manacost+" mana\n"+
+                out.card_attack+"/"+
+                out.card_health+"\n"+
+                out.card_text;
+            message.channel.sendFile(out.card_image)
+                .then(function(){message.channel.sendMessage(reply);});
         }
         return true;
     }
