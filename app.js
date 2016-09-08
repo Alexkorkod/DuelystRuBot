@@ -128,7 +128,7 @@ var checkMessageForCard = function (message) {
     if (chosen_cards_list.length > 0) {
         out = checkCardsCollection(chosen_cards_list);
         if (typeof out === "string") {
-            message.channel.sendMessage(out + "?");
+            message.channel.sendMessage(out);
         } else {
             reply = out.card_label+" : "+
                 out.card_manacost+" mana\n"+
@@ -150,17 +150,23 @@ var checkCardsCollection = function(collection) {
     if (Object.keys(collection).length == 1) {
         out = collection[(Object.keys(collection)[0])];
     } else {
-        out = "";
-        counter = 0;
-        for (var item in collection) {
-            if (counter == Object.keys(collection).length-1) {
-                out = out + " или $" + collection[item].card_label;
-            } else { 
-                out = out + ", $" + collection[item].card_label;
+        if (Object.keys(collection).length <= 5) {
+            out = "";
+            counter = 0;
+            for (var item in collection) {
+                if (counter == Object.keys(collection).length-1) {
+                    out = out + " или $" + collection[item].card_label;
+                } else { 
+                    out = out + ", $" + collection[item].card_label;
+                }
+                counter++;
             }
-            counter++;
+            out = out.replace(", ","");
+            out = out + "?";
+        } else {
+            out = "Слишком много карт совпадают с этим запросом.\n"+
+            "Пожалуйста поконкретней.";
         }
-        out = out.replace(", ","");
     }
     return out;
 };
