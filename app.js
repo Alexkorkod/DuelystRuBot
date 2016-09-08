@@ -10,14 +10,10 @@ var request = require('request'),
     card_health,
     card_text;
 
-request("https://duelystdb.com/card/all.json",
-    function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        card_list = JSON.parse(body);
-      }
-    }
-  );
-  
+fs.readFile("./bd.json", (err, data) => {
+  if (err) throw err;
+  card_list = JSON.parse(data);
+});
 fs.readFile("./shimzar.json", (err, data) => {
   if (err) throw err;
   card_list_shimzar = JSON.parse(data);
