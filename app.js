@@ -37,11 +37,12 @@ bot.login(process.env.BOT_TOKEN);
 
 bot.on('message', message => {
     var re_hello = new RegExp("\\$(привет|hello|hi|list|commands|команды|bot|бот).*");
-    if (message.content.toLowerCase().match(re_hello) && message.author.bot == false ) {
+    if (message.content.toLowerCase().match(re_hello) && message.author.bot === false ) {
         message.channel.sendMessage("Привет! Я бот этого канала.\n"+
-        "Пока что я умею рассказывать про карту, если написать ее название на английском, поставив перед ним символ $.\n"+
+        "Я умею рассказывать про карту, если написать ее название на английском, поставив перед ним символ $.\n"+
         "Если не помнишь название карты целиком - не беда, я пойму тебя даже по его части!\n"+
-        "А еще, если напишешь $deck перед сообщением, я его скопирую в канал с колодами.");
+        "Комманда $decklist выдаст тебе ссылку на свежие колоды."+
+        "А еще, если напишешь $deck перед сообщением, я его скопирую в канал \"decks\".");
     } else {
         checkMessageForBotContent(message);
     }
@@ -75,13 +76,25 @@ var checkMessageForShimzar = function (message) {
 
 var checkMessageForBotContent = function (message) {
     if (message.content.charAt(0) == "$" && message.author.bot === false) {
-        if (!checkMessageForDeck(message)) {
-            if (!checkMessageForCard(message)){
-                message.channel.sendMessage("Извини, но такой команды я не знаю.\n"+
-                    "Информацию обо мне можно посмотреть по команде $bot");
+        if (!checkMessageForDeckList(message)) {
+            if (!checkMessageForDeck(message)) {
+                if (!checkMessageForCard(message)){
+                    message.channel.sendMessage("Извини, но такой команды я не знаю.\n"+
+                        "Информацию обо мне можно посмотреть по команде $bot");
+                }
             }
         }
     }
+};
+
+var checkMessageForDeckList = function (message) {
+    var re_deck = new RegExp("\\$decklist.*");
+    if (message.content.toLowerCase().match(re_deck) && message.author.bot === false) {
+        message.channel.sendMessage("Актуальные колоды можно посмотреть тут:\n"+
+            "http://manaspring.ru/decklist/");
+        return true;
+    }
+    return false;
 };
 
 var checkMessageForDeck = function (message) {
@@ -108,7 +121,7 @@ var checkMessageForCard = function (message) {
         if (item.label.toLowerCase().match(re) && item.faction_id != 200 && item.enabled == 1) {
             chosen_cards_list[counter] = [];
             chosen_cards_list[counter].card_type = item.type;
-		chosen_cards_list[counter].duelyst_id = item.duelyst_id;
+            chosen_cards_list[counter].duelyst_id = item.duelyst_id;
             chosen_cards_list[counter].card_label = item.label;
             chosen_cards_list[counter].card_manacost = item.mana_cost;
             chosen_cards_list[counter].card_attack = item.attack;
@@ -125,20 +138,20 @@ var checkMessageForCard = function (message) {
             message.channel.sendMessage(out + "?");
         } else {
             if (!("url" in out)) {
-		out.card_image = "https://duelystdb.com/sprites/"
-		if (out.card_type=="Spell" || out.card_type=="Artifact") {
-			out.card_image = out.card_image + out.duelyst_id + "_active.gif";
-		} else {
-			out.card_image = out.card_image + out.duelyst_id + "_attack.gif";
-		}
-                message.channel.sendMessage(out.card_image+"\n"+
-                    out.card_label+" : "+
-                    out.card_manacost+" mana\n"+
-                    out.card_attack+"/"+
-                    out.card_health+"\n"+
-                    out.card_text); 
+                out.card_image = "https://duelystdb.com/sprites/";
+                if (out.card_type=="Spell" || out.card_type=="Artifact") {
+                    out.card_image = out.card_image + out.duelyst_id + "_active.gif";
+                } else {
+                    out.card_image = out.card_image + out.duelyst_id + "_attack.gif";
+                    }
+                    message.channel.sendMessage(out.card_image+"\n"+
+                        out.card_label+" : "+
+                        out.card_manacost+" mana\n"+
+                        out.card_attack+"/"+
+                        out.card_health+"\n"+
+                        out.card_text); 
             } else {
-                message.channel.sendMessage(out.url);
+                 message.channel.sendMessage(out.url);
             }
         }
         return true;
