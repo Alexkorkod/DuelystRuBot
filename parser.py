@@ -16,6 +16,7 @@ for i in elist:
     mana = i.find_class('mana-cost')
     l = i.find_class('card-name')
     img = i.find_class('card-image')
+    card_type=i.find_class('card-type')
     for ii in desc:
         descr = ii.text_content()
     for ii in att:
@@ -28,6 +29,11 @@ for i in elist:
         label = ii.text_content()
     for ii in img:
         image = etree.tostring(ii.cssselect('[src]').pop())
-        image = "http://manaspring.ru/deckbuilder/"+image[image.rfind("..")+2:len(image)-3]
+        image = "http://manaspring.ru/deckbuilder"+image[image.rfind("..")+2:len(image)-3]
+    for ii in card_type:
+        c_type = ii.text_content()
+    if c_type == 'Spell' or c_type == 'Artifact':
+        at = ''
+        health = ''
     print('{"label":"'+label+'","image":"'+image+'","description":"'+descr+'","attack":"'+at+'","health":"'+health+'","mana_cost":"'+cost+'"},', file=f)
 print("]", file=f)

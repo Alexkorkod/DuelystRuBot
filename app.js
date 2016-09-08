@@ -46,9 +46,7 @@ bot.on('message', message => {
 
 bot.on('guildMemberAdd', (guild, member) => {
     var channel = guild.channels.find("name","general");
-    channel.sendMessage(member.user.toString()+" Добро пожаловать на русский канал по Duelyst-у!\n"+
-    "Здесь вам с радостью ответят на вопросы по игре и не только.\n"+
-    "А больше обо мне вы можете узнать, написав в чат `$bot`.");
+    channel.sendMessage("Привет и добро пожаловать, " + member.user.toString()+ ".");
 });
 
 bot.on('error', (error) => {
