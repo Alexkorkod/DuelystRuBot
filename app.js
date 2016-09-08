@@ -130,11 +130,17 @@ var checkMessageForCard = function (message) {
         if (typeof out === "string") {
             message.channel.sendMessage(out);
         } else {
-            reply = out.card_label+" : "+
-                out.card_manacost+" mana\n"+
-                out.card_attack+"/"+
-                out.card_health+"\n"+
-                out.card_text;
+            if (out.card_attack !== "") {
+                reply = out.card_label+" : "+
+                    out.card_manacost+" mana\n"+
+                    out.card_attack+"/"+
+                    out.card_health+"\n"+
+                    out.card_text;
+            } else {
+                reply = out.card_label+" : "+
+                    out.card_manacost+" mana\n"+
+                    out.card_text;
+            }
             message.channel.sendFile(out.card_image)
                 .then(function(){message.channel.sendMessage(reply);});
         }
