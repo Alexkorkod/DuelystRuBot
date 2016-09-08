@@ -32,7 +32,7 @@ bot.on('ready', () => {
 bot.login(process.env.BOT_TOKEN);
 
 bot.on('message', message => {
-    var re_hello = new RegExp("\\$(привет|hello|hi|list|commands|команды|bot|бот).*");
+    var re_hello = new RegExp("^\\$(привет|hello|hi|list|commands|команды|bot|бот).*");
     if (message.content.toLowerCase().match(re_hello) && message.author.bot === false ) {
         message.channel.sendMessage("Привет! Я бот этого канала.\n"+
         "Я умею рассказывать про карту, если написать ее название на английском, поставив перед ним символ $.\n"+
@@ -84,7 +84,7 @@ var checkMessageForBotContent = function (message) {
 };
 
 var checkMessageForDeckList = function (message) {
-    var re_deck = new RegExp("\\$decklist.*");
+    var re_deck = new RegExp("^\\$decklist.*");
     if (message.content.toLowerCase().match(re_deck) && message.author.bot === false) {
         message.channel.sendMessage("Актуальные колоды можно посмотреть тут:\n"+
             "http://manaspring.ru/decklist/");
@@ -94,7 +94,7 @@ var checkMessageForDeckList = function (message) {
 };
 
 var checkMessageForDeck = function (message) {
-    var re_deck = new RegExp("\\$deck.*");
+    var re_deck = new RegExp("^\\$deck.*");
     if (message.content.toLowerCase().match(re_deck) && message.author.bot === false) {
         var deck_channel = message.guild.channels.find("name","decks");
         if (message.attachments.array().length > 0) {
@@ -114,10 +114,9 @@ var checkMessageForCard = function (message) {
         var loweredContent = message.content.toLowerCase(),
             trimmedContent = loweredContent.replace("$",""),
             re = new RegExp(".*"+trimmedContent+".*");
-        if (item.label.toLowerCase().match(re) && item.faction_id != 200 && item.enabled == 1) {
+        if (item.label.toLowerCase().match(re)) {
             chosen_cards_list[counter] = [];
-            chosen_cards_list[counter].card_type = item.type;
-            chosen_cards_list[counter].duelyst_id = item.duelyst_id;
+            chosen_cards_list[counter].card_image = item.image;
             chosen_cards_list[counter].card_label = item.label;
             chosen_cards_list[counter].card_manacost = item.mana_cost;
             chosen_cards_list[counter].card_attack = item.attack;
@@ -126,26 +125,18 @@ var checkMessageForCard = function (message) {
             counter++;
         }
     });
-    chosen_cards_list_shimzar = checkMessageForShimzar(message);
-    chosen_cards_list = chosen_cards_list.concat(chosen_cards_list_shimzar);
     if (chosen_cards_list.length > 0) {
         out = checkCardsCollection(chosen_cards_list);
         if (typeof out === "string") {
             message.channel.sendMessage(out + "?");
         } else {
             if (!("url" in out)) {
-                out.card_image = "https://duelystdb.com/sprites/";
-                if (out.card_type=="Spell" || out.card_type=="Artifact") {
-                    out.card_image = out.card_image + out.duelyst_id + "_active.gif";
-                } else {
-                    out.card_image = out.card_image + out.duelyst_id + "_attack.gif";
-                    }
-                    message.channel.sendMessage(out.card_image+"\n"+
-                        out.card_label+" : "+
-                        out.card_manacost+" mana\n"+
-                        out.card_attack+"/"+
-                        out.card_health+"\n"+
-                        out.card_text); 
+                message.channel.sendMessage(out.card_image+"\n"+
+                    out.card_label+" : "+
+                    out.card_manacost+" mana\n"+
+                    out.card_attack+"/"+
+                    out.card_health+"\n"+
+                    out.card_text); 
             } else {
                  message.channel.sendMessage(out.url);
             }
