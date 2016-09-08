@@ -151,18 +151,11 @@ var checkCardsCollection = function(collection) {
         counter;
     collection = makeCollUnique(collection);
     if (Object.keys(collection).length == 1) {
-        if ("card_text" in collection[(Object.keys(collection)[0])]) {
-            out = replaceHTML(collection[(Object.keys(collection)[0])]);
-        } else {
-            out = collection[(Object.keys(collection)[0])];
-        }
+        out = collection[(Object.keys(collection)[0])];
     } else {
         out = "";
         counter = 0;
         for (var item in collection) {
-            if (card_text in collection[item] && collection[item].card_text !== "") {
-                collection[item] = replaceHTML(collection[item]);
-            }
             if (counter == Object.keys(collection).length-1) {
                 out = out + " или $" + collection[item].card_label;
             } else { 
@@ -184,10 +177,3 @@ var makeCollUnique = function(collection) {
     });
     return uniqueColl;
 };
-
-var replaceHTML = function(item) {
-    item.card_text = item.card_text.replace(/<b>/g,"");
-    item.card_text = item.card_text.replace(/<\/b>/g,"");
-    item.card_text = item.card_text.replace(/<br>/g,"\n");
-    return item;
-}
