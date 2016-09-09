@@ -50,7 +50,7 @@ bot.on('error', (error) => {
 
 var checkMessageForBotContent = function (message) {
     if (message.content.charAt(0) == "$" && message.author.bot === false) {
-        if (!checkMessageForRandom) {
+        if (!checkMessageForRandom(message)) {
             if (!checkMessageForDeckList(message)) {
                 if (!checkMessageForDeck(message)) {
                     if (!checkMessageForCard(message)){
