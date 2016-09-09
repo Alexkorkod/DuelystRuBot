@@ -65,14 +65,22 @@ var checkMessageForBotContent = function (message) {
 };
 
 var sendCardInfo = function (out,message) {
+    var reply = "**"+out.card_label+"** : ";
     if (out.card_attack !== "") {
-        reply = out.card_label+" : "+
-            out.card_manacost+" mana\n"+
-            out.card_attack+"/"+
-            out.card_health+"\n"+
-            out.card_text;
+        if (out.card_manacost !== "") {
+            reply = reply + 
+                out.card_manacost+" mana\n"+
+                out.card_attack+"/"+
+                out.card_health+"\n"+
+                out.card_text;
+        } else {
+            reply = reply + 
+                out.card_attack+"/"+
+                out.card_health+"\n"+
+                out.card_text;
+        }
     } else {
-        reply = out.card_label+" : "+
+        reply = reply +
             out.card_manacost+" mana\n"+
             out.card_text;
         }
