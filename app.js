@@ -86,7 +86,7 @@ var sendCardInfo = function (out,message) {
     }
     message.channel.sendFile(out.image)
         .then(function(mess){
-            mess.delete(1000*60*10)
+            mess.delete(1000*60*10);
             message.channel.sendMessage(reply)
                 .then(mess => mess.delete(1000*60*10));
         });
