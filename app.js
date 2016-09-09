@@ -2,7 +2,6 @@ var request = require('request'),
     fs = require('fs'),
     parsedContent, 
     card_list = [],
-    card_list_shimzar = [], 
     card_image,
     card_label,
     card_manacost,
@@ -13,10 +12,6 @@ var request = require('request'),
 fs.readFile("./bd.json", (err, data) => {
   if (err) throw err;
   card_list = JSON.parse(data);
-});
-fs.readFile("./shimzar.json", (err, data) => {
-  if (err) throw err;
-  card_list_shimzar = JSON.parse(data);
 });
 
 const Discord = require('discord.js');
@@ -53,39 +48,50 @@ bot.on('error', (error) => {
   console.log(error);
 });
 
-var checkMessageForShimzar = function (message) {
-    var out = [],
-        counter = 1000;
-    card_list_shimzar.forEach(function(item){
-        var loweredContent = message.content.toLowerCase(),
-            trimmedContent = loweredContent.replace("$",""),
-            re = new RegExp(".*"+trimmedContent+".*");
-        if (item.label.toLowerCase().match(re)){
-            out[counter] = [];
-            out[counter].url = item.url;
-            out[counter].card_label = item.label;
-            counter++;
-        }
-    });
-    return out;
-};
-
 var checkMessageForBotContent = function (message) {
     if (message.content.charAt(0) == "$" && message.author.bot === false) {
-        if (!checkMessageForDeckList(message)) {
-            if (!checkMessageForDeck(message)) {
-                if (!checkMessageForCard(message)){
-                    message.channel.sendMessage("Извини, но такой команды я не знаю.\n"+
-                        "Информацию обо мне можно посмотреть по команде $bot");
+        if (!checkMessageForRandom) {
+            if (!checkMessageForDeckList(message)) {
+                if (!checkMessageForDeck(message)) {
+                    if (!checkMessageForCard(message)){
+                        message.channel.sendMessage("Извини, но такой команды я не знаю.\n"+
+                            "Информацию обо мне можно посмотреть по команде $bot");
+                    }
                 }
             }
         }
     }
 };
 
+var sendCardInfo = function (out) {
+    if (out.card_attack !== "") {
+        reply = out.card_label+" : "+
+            out.card_manacost+" mana\n"+
+            out.card_attack+"/"+
+            out.card_health+"\n"+
+            out.card_text;
+    } else {
+        reply = out.card_label+" : "+
+            out.card_manacost+" mana\n"+
+            out.card_text;
+        }
+    message.channel.sendFile(out.card_image)
+        .then(function(){message.channel.sendMessage(reply);});
+};
+
+var checkMessageForRandom = function (message) {
+    var re_random = new RegExp("^\\$random.*");
+    if (message.content.toLowerCase().match(re_random)) {
+        card = Object.keys(card_list)[randomInteger(0,Object.keys(card_list).length)];
+        sendCardInfo(card);
+        return true;
+    }
+    return false;
+};
+
 var checkMessageForDeckList = function (message) {
     var re_deck = new RegExp("^\\$decklist.*");
-    if (message.content.toLowerCase().match(re_deck) && message.author.bot === false) {
+    if (message.content.toLowerCase().match(re_deck)) {
         message.channel.sendMessage("Актуальные колоды можно посмотреть тут:\n"+
             "http://manaspring.ru/decklist/");
         return true;
@@ -130,19 +136,7 @@ var checkMessageForCard = function (message) {
         if (typeof out === "string") {
             message.channel.sendMessage(out);
         } else {
-            if (out.card_attack !== "") {
-                reply = out.card_label+" : "+
-                    out.card_manacost+" mana\n"+
-                    out.card_attack+"/"+
-                    out.card_health+"\n"+
-                    out.card_text;
-            } else {
-                reply = out.card_label+" : "+
-                    out.card_manacost+" mana\n"+
-                    out.card_text;
-            }
-            message.channel.sendFile(out.card_image)
-                .then(function(){message.channel.sendMessage(reply);});
+            sendCardInfo(out);
         }
         return true;
     }
@@ -186,3 +180,9 @@ var makeCollUnique = function(collection) {
     });
     return uniqueColl;
 };
+
+var randomInteger = function (min, max) {
+    var rand = min - 0.5 + Math.random() * (max - min + 1);
+    rand = Math.round(rand);
+    return rand;
+  };
