@@ -63,7 +63,7 @@ var checkMessageForBotContent = function (message) {
     }
 };
 
-var sendCardInfo = function (out) {
+var sendCardInfo = function (out,message) {
     if (out.card_attack !== "") {
         reply = out.card_label+" : "+
             out.card_manacost+" mana\n"+
@@ -83,7 +83,7 @@ var checkMessageForRandom = function (message) {
     var re_random = new RegExp("^\\$random.*");
     if (message.content.toLowerCase().match(re_random)) {
         card = Object.keys(card_list)[randomInteger(0,Object.keys(card_list).length)];
-        sendCardInfo(card);
+        sendCardInfo(card,message);
         return true;
     }
     return false;
@@ -136,7 +136,7 @@ var checkMessageForCard = function (message) {
         if (typeof out === "string") {
             message.channel.sendMessage(out);
         } else {
-            sendCardInfo(out);
+            sendCardInfo(out,message);
         }
         return true;
     }
