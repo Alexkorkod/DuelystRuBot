@@ -83,9 +83,13 @@ var sendCardInfo = function (out,message) {
         reply = reply +
             out.mana_cost+" mana\n"+
             out.description;
-        }
+    }
     message.channel.sendFile(out.image)
-        .then(function(){message.channel.sendMessage(reply);});
+        .then(function(mess){
+            mess.delete(1000*60*10)
+            message.channel.sendMessage(reply)
+                .then(mess => mess.delete(1000*60*10));
+        });
 };
 
 var checkMessageForRandom = function (message) {
@@ -121,21 +125,38 @@ var checkMessageForDeck = function (message) {
     return false;
 };
 
-var checkMessageForCard = function (message) {
-    var chosen_cards_list = [],
-        counter = 0,
-        out;
-    card_list.forEach(function(item){
-        var loweredContent = message.content.toLowerCase(),
-            trimmedContent = loweredContent.replace("$",""),
-            shortContent = trimmedContent.split(" ")[0],
-            re = new RegExp(".*"+shortContent+".*");
-        if (item.label.toLowerCase().match(re)) {
-            chosen_cards_list[counter] = item;
-            counter++;
+var checkMessageForCardAdv = function (message,split) {
+    var phrase = message,
+        chosen_cards_list = [];
+    split = split.reverse();
+    split.some(function(word){
+        var re = new RegExp(".*"+phrase+".*");
+            counter = 0;
+        card_list.forEach(function(item){
+            if (item.label.toLowerCase().match(re)) {
+                chosen_cards_list[counter] = item;
+                counter++;
+            }
+        });
+        phrase = phrase.replace(" "+word,"");
+        if (chosen_cards_list.length > 0) {
+            return true;
         }
     });
     if (chosen_cards_list.length > 0) {
+        return chosen_cards_list;
+    }
+    return false;
+};
+
+var checkMessageForCard = function (message) {
+    var chosen_cards_list = [],
+        out,
+        loweredContent = message.content.toLowerCase(),
+        trimmedContent = loweredContent.replace("$",""),
+        split = trimmedContent.split(" ");
+    chosen_cards_list = checkMessageForCardAdv(trimmedContent,split);
+    if (chosen_cards_list !== false) {
         out = checkCardsCollection(chosen_cards_list);
         if (typeof out === "string") {
             message.channel.sendMessage(out);
@@ -159,9 +180,9 @@ var checkCardsCollection = function(collection) {
             counter = 0;
             for (var item in collection) {
                 if (counter == Object.keys(collection).length-1) {
-                    out = out + " или $" + collection[item].card_label;
+                    out = out + " или $" + collection[item].label;
                 } else { 
-                    out = out + ", $" + collection[item].card_label;
+                    out = out + ", $" + collection[item].label;
                 }
                 counter++;
             }
@@ -178,8 +199,8 @@ var checkCardsCollection = function(collection) {
 var makeCollUnique = function(collection) {
     var uniqueColl = [];
     collection.forEach(function(card) {
-        if (!(card.card_label in uniqueColl)) {
-            uniqueColl[card.card_label] = card;
+        if (!(card.label in uniqueColl)) {
+            uniqueColl[card.label] = card;
         }
     });
     return uniqueColl;
