@@ -65,26 +65,26 @@ var checkMessageForBotContent = function (message) {
 };
 
 var sendCardInfo = function (out,message) {
-    var reply = "**"+out.card_label+"** : ";
-    if (out.card_attack !== "") {
-        if (out.card_manacost !== "") {
+    var reply = "**"+out.label+"** : ";
+    if (out.attack !== "") {
+        if (out.mana_cost !== "") {
             reply = reply + 
-                out.card_manacost+" mana\n"+
-                out.card_attack+"/"+
-                out.card_health+"\n"+
-                out.card_text;
+                out.mana_cost+" mana\n"+
+                out.attack+"/"+
+                out.health+"\n"+
+                out.description;
         } else {
             reply = reply + 
-                out.card_attack+"/"+
-                out.card_health+"\n"+
-                out.card_text;
+                out.attack+"/"+
+                out.health+"\n"+
+                out.description;
         }
     } else {
         reply = reply +
-            out.card_manacost+" mana\n"+
-            out.card_text;
+            out.mana_cost+" mana\n"+
+            out.description;
         }
-    message.channel.sendFile(out.card_image)
+    message.channel.sendFile(out.image)
         .then(function(){message.channel.sendMessage(reply);});
 };
 
@@ -92,13 +92,6 @@ var checkMessageForRandom = function (message) {
     var re_random = new RegExp("^\\$random.*");
     if (message.content.toLowerCase().match(re_random)) {
         card = card_list[Object.keys(card_list)[randomInteger(0,Object.keys(card_list).length)]];
-        //TODO rework it
-        card.card_image = card.image;
-        card.card_label = card.label;
-        card.card_manacost = card.mana_cost;
-        card.card_attack = card.attack;
-        card.card_health = card.health;
-        card.card_text = card.description;
         sendCardInfo(card,message);
         return true;
     }
@@ -138,13 +131,7 @@ var checkMessageForCard = function (message) {
             shortContent = trimmedContent.split(" ")[0],
             re = new RegExp(".*"+shortContent+".*");
         if (item.label.toLowerCase().match(re)) {
-            chosen_cards_list[counter] = [];
-            chosen_cards_list[counter].card_image = item.image;
-            chosen_cards_list[counter].card_label = item.label;
-            chosen_cards_list[counter].card_manacost = item.mana_cost;
-            chosen_cards_list[counter].card_attack = item.attack;
-            chosen_cards_list[counter].card_health = item.health;
-            chosen_cards_list[counter].card_text = item.description;
+            chosen_cards_list[counter] = item;
             counter++;
         }
     });
