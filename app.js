@@ -32,7 +32,7 @@ bot.on('message', message => {
         message.channel.sendMessage("Привет! Я бот этого канала.\n"+
         "Я умею рассказывать про карту, если написать ее название на английском, поставив перед ним символ $.\n"+
         "Если не помнишь название карты целиком - не беда, я пойму тебя даже по его части!\n"+
-	"$random выдает случайную карту.\n"+
+        "$random выдает случайную карту.\n"+
         "Команда $decklist выдаст тебе ссылку на свежие колоды.\n"+
         "А еще, если напишешь $deck перед сообщением, я его скопирую в канал \"decks\".");
     } else {
@@ -135,7 +135,8 @@ var checkMessageForCard = function (message) {
     card_list.forEach(function(item){
         var loweredContent = message.content.toLowerCase(),
             trimmedContent = loweredContent.replace("$",""),
-            re = new RegExp(".*"+trimmedContent+".*");
+            shortContent = trimmedContent.split(" ")[0],
+            re = new RegExp(".*"+shortContent+".*");
         if (item.label.toLowerCase().match(re)) {
             chosen_cards_list[counter] = [];
             chosen_cards_list[counter].card_image = item.image;
