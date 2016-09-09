@@ -82,7 +82,14 @@ var sendCardInfo = function (out,message) {
 var checkMessageForRandom = function (message) {
     var re_random = new RegExp("^\\$random.*");
     if (message.content.toLowerCase().match(re_random)) {
-        card = Object.keys(card_list)[randomInteger(0,Object.keys(card_list).length)];
+        card = card_list[Object.keys(card_list)[randomInteger(0,Object.keys(card_list).length)]];
+        //TODO rework it
+        card.card_image = card.image;
+        card.card_label = card.label;
+        card.card_manacost = card.mana_cost;
+        card.card_attack = card.attack;
+        card.card_health = card.health;
+        card.card_text = card.description;
         sendCardInfo(card,message);
         return true;
     }
