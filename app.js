@@ -64,6 +64,29 @@ var checkMessageForBotContent = function (message) {
     }
 };
 
+var processDesc = function (description) {
+    var keywords = ["Rush","Frenzy","Provoke","Forcefield","Flying","Blast","Ranged"],
+        split,
+        result,
+        dirt;
+    if (description.indexOf(",") > 0) {
+        split = description.split(", ");
+    } else {
+        split = description.split(" ");
+    }
+    split.forEach(function(word, index, split){
+        if (keywords.indexOf(word) >= 0){
+            split[index] = "**" + word + "**";
+        } 
+    });
+    if (description.indexOf(",") > 0) {
+        result = split.join(", ");
+    } else {
+        result = split.join(" ");
+    }
+    return result;
+};
+
 var sendCardInfo = function (out,message) {
     var reply = "**"+out.label+"** : ";
     if (out.attack !== "") {
@@ -72,17 +95,17 @@ var sendCardInfo = function (out,message) {
                 out.mana_cost+" mana\n"+
                 out.attack+"/"+
                 out.health+"\n"+
-                out.description;
+                processDesc(out.description);
         } else {
             reply = reply + 
                 out.attack+"/"+
                 out.health+"\n"+
-                out.description;
+                processDesc(out.description);
         }
     } else {
         reply = reply +
             out.mana_cost+" mana\n"+
-            out.description;
+            processDesc(out.description);
     }
     message.channel.sendFile(out.image)
         .then(function(mess){
