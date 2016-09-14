@@ -107,11 +107,9 @@ var sendCardInfo = function (out,message) {
             out.mana_cost+" mana\n"+
             processDesc(out.description);
     }
-    message.channel.sendFile(out.image)
+    message.channel.sendFile(out.image,null,reply)
         .then(function(mess){
             mess.delete(1000*60*10);
-            message.channel.sendMessage(reply)
-                .then(mess => mess.delete(1000*60*10));
         });
 };
 
