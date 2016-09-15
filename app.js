@@ -138,7 +138,7 @@ var checkMessageForDeck = function (message) {
     if (message.content.toLowerCase().match(re_deck) && message.author.bot === false) {
         var deck_channel = message.guild.channels.find("name","decks");
         if (message.attachments.array().length > 0) {
-            deck_channel.sendFile(message.attachments.array()[0].url);
+            deck_channel.sendFile(message.attachments.array()[0].url,'',message.content.replace("$deck",""));
         }
         deck_channel.sendMessage(message.content.replace("$deck",""));
         return true;
