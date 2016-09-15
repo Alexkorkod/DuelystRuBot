@@ -46,7 +46,7 @@ bot.on('guildMemberAdd', (guild, member) => {
 });
 
 bot.on('error', (error) => {
-  console.log(error);
+  fs.appendFile("./bot.log",error);
 });
 
 var checkMessageForBotContent = function (message) {
