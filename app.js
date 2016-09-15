@@ -195,8 +195,7 @@ var checkCardsCollection = function(collection) {
     collection = makeCollUnique(collection);
     if (Object.keys(collection).length == 1) {
         out = collection[(Object.keys(collection)[0])];
-    } else {
-        if (Object.keys(collection).length <= 5) {
+    } else if (Object.keys(collection).length <= 5) {
             out = "";
             counter = 0;
             for (var item in collection) {
@@ -209,10 +208,9 @@ var checkCardsCollection = function(collection) {
             }
             out = out.replace(", ","");
             out = out + "?";
-        } else {
-            out = "Слишком много карт совпадают с этим запросом.\n"+
+    } else {
+        out = "Слишком много карт совпадают с этим запросом.\n"+
             "Пожалуйста поконкретней.";
-        }
     }
     return out;
 };
