@@ -18,6 +18,7 @@ for page in pages:
     f = open(page[33:page.rfind('/')]+".json",'w')
     print("[", file=f)
     cost = ''
+    k = 1
     for i in elist:
         desc = i.find_class('card-description')
         att = i.find_class('attack')
@@ -57,5 +58,9 @@ for page in pages:
             health = ''
         if 'rarity' not in globals():
             rarity = ''
-        print('{"label":"'+label+'","image":"'+image+'","rarity":"'+rarity+'","type":"'+c_type+'","description":"'+descr+'","attack":"'+at+'","health":"'+health+'","mana_cost":"'+cost+'"},', file=f)
+        if k==len(elist):
+            print('{"label":"'+label+'","image":"'+image+'","rarity":"'+rarity+'","type":"'+c_type+'","description":"'+descr+'","attack":"'+at+'","health":"'+health+'","mana_cost":"'+cost+'"}', file=f)
+        if k!=len(elist):
+            print('{"label":"'+label+'","image":"'+image+'","rarity":"'+rarity+'","type":"'+c_type+'","description":"'+descr+'","attack":"'+at+'","health":"'+health+'","mana_cost":"'+cost+'"},', file=f)
+        k = k+1
     print("]", file=f)

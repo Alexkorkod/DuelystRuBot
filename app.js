@@ -65,7 +65,7 @@ var checkMessageForBotContent = function (message) {
 };
 
 var processDesc = function (description) {
-    var keywords = ["Rush","Frenzy","Provoke","Forcefield","Flying","Blast","Ranged"],
+    var keywords = ["Airdrop","Rush","Frenzy","Provoke","Forcefield","Flying","Blast","Ranged"],
         split,
         result,
         dirt;
@@ -89,9 +89,13 @@ var processDesc = function (description) {
 
 var sendCardInfo = function (out,message) {
     var reply = "**"+out.label+"** : ";
+    if (out.rarity === "") {
+        out.rarity = "basic";
+    }
+    reply = reply + out.rarity + " : ";
     if (out.attack !== "") {
         if (out.mana_cost !== "") {
-            reply = reply + 
+            reply = reply +
                 out.mana_cost+" mana\n"+
                 out.attack+"/"+
                 out.health+"\n"+
@@ -139,8 +143,9 @@ var checkMessageForDeck = function (message) {
         var deck_channel = message.guild.channels.find("name","decks");
         if (message.attachments.array().length > 0) {
             deck_channel.sendFile(message.attachments.array()[0].url,'',message.content.replace("$deck",""));
+        } else {
+            deck_channel.sendMessage(message.content.replace("$deck",""));
         }
-        deck_channel.sendMessage(message.content.replace("$deck",""));
         return true;
     }
     return false;
